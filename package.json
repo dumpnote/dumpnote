@@ -1,0 +1,18 @@
+{
+  "name": "dumpnote",
+  "version": "1.0.0",
+  "description": "dump you a note",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dumpnote/dumpnote.git"
+  },
+  "dependencies": {
+    "request": "^2.81.0",
+    "request-promise-native": "latest",
+    "restify": "latest"
+  },
+  "scripts": {
+    "start": "node server.js"
+  }
+}
