@@ -69,7 +69,7 @@ class QueryBuilder {
     const params = [];
     if (this.predicate) {
       const compiled = this.predicate.compile();
-      let i = 0;
+      let i = 1;
       for (const param of compiled.params) {
         params.push(param);
       }
@@ -94,7 +94,7 @@ class Table {
 
   insert(values) {
     const query = `INSERT INTO ${this.name}` +
-      ` VALUES (${values.map((p, i) => `$${i}`).join(', ')})`;
+      ` VALUES (${values.map((p, i) => `$${i + 1}`).join(', ')})`;
     logger.info(`Executing query ${query} with params ${values}`);
     return this.db.query(query, values);
   }
