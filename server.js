@@ -58,7 +58,7 @@ server.get('/authcb',
   passport.authenticate('google', {
     failureRedirect: '/auth',
     failureFlash: true,
-  }), (req, res) => res.redirect(process.env.DN_AUTH_CB));
+  }), (req, res, next) => res.redirect(process.env.DN_AUTH_CB, next));
 
 server.get('/authstatus', (req, res) =>
   res.send(200, {authed: req.isAuthenticated()}));
