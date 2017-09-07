@@ -86,7 +86,8 @@ class Table {
   }
 
   select(fields) {
-    return new QueryBuilder(this, fields);
+    return new QueryBuilder(
+      this, Array.isArray(fields) ? fields : [fields]));
   }
 
   insert(values) {
