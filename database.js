@@ -64,18 +64,18 @@ class QueryBuilder {
   }
 
   execute() {
-    let query = `SELECT ${this.fields.map((f, i) => `$${i + 1}`).join(', ')}` +
-        ` FROM ${this.table.name}`;
+    let query = `SELECT ${this.fields.join(', ')} FROM ${this.table.name}`;
+    const params = [];
     if (this.predicate) {
       const compiled = this.predicate.compile();
-      let i = this.fields.length + 1;
+      let i = 1;
       for (const param of compiled.params) {
-        this.fields.push(param);
+        params.push(param);
       }
       compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
       query += ` WHERE ${compiled.strVal}`;
     }
-    return this.table.db.query(query, this.fields);
+    return this.table.db.query(query, params);
   }
 }
 
