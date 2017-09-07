@@ -46,12 +46,27 @@ class User {
     if (cached) {
       return cached;
     }
+    const result = await db.tables.user.select('*')
+      .where(new db.Predicate('gid', '=', params.gid))
+      .execute();
+    if (result.rowCount !== 0) {
+      const row = result.rows[0];
+      const user = new User(row.id);
+      user.name = row.name;
+      user.email = row.email;
+      user.gid = row.gid;
+      userCache.set(row.id, user);
+      userCacheByGid.set(row.gid, user);
+      return user;
+    }
     const id = await User.getNextId();
     await db.tables.users.insert([id, params.name, params.email, params.gid]);
     const user = new User(id);
     user.name = params.name;
     user.email = params.email;
     user.gid = params.gid;
+    userCache.set(user.id, user);
+    userCacheByGid.set(user.gid, user);
     return user;
   }
 
