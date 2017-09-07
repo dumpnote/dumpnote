@@ -1,7 +1,7 @@
 const restify = require('restify');
 const passport = require('passport-restify');
 const GoogleStrategy = require('passport-google-oauth20');
-const bunyan = require('bunyan');
+const logger = require('./logger');
 const User = require('./user');
 const db = require('./database').db;
 
@@ -11,9 +11,6 @@ const db = require('./database').db;
 const app = {
   name: 'dumpnote',
 };
-const logger = bunyan.createLogger({
-  name: app.name,
-});
 
 /*
  * passport config

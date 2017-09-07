@@ -1,4 +1,5 @@
 const pg = require('pg');
+const logger = require('./logger');
 
 pg.defaults.ssl = true;
 const db = new pg.Pool({
@@ -37,7 +38,7 @@ class Predicate {
       if (adjoined.obj.adjoined.length > 0) {
         strVal += ` ${adjoined.conj} (${compiled.strVal})`;
       } else {
-        strVal += ` ${adjoined.conj} ${compiled.strVal}}`;
+        strVal += ` ${adjoined.conj} ${compiled.strVal}`;
       }
       for (const param of compiled.params) {
         params.push(param);
@@ -75,6 +76,7 @@ class QueryBuilder {
       compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
       query += ` WHERE ${compiled.strVal}`;
     }
+    logger.info(`Executing query ${query} with params ${params}`);
     return this.table.db.query(query, params);
   }
 }
@@ -91,8 +93,10 @@ class Table {
   }
 
   insert(values) {
-    return this.db.query(`INSERT INTO ${this.name}` +
-      ` VALUES(${values.map((p, i) => `$${i}`).join(', ')})`, values);
+    const query = `INSERT INTO ${this.name}` +
+      ` VALUES(${values.map((p, i) => `$${i}`).join(', ')})`;
+    logger.info(`Executing query ${query} with params ${values}`);
+    return this.db.query(query, values);
   }
 }
 
