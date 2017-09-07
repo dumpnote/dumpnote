@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "bunyan": "^1.8.12",
+    "client-sessions": "^0.8.0",
     "eslint-config-google": "^0.9.1",
     "node-fieldbook": "^1.1.1",
     "passport-google-oauth20": "^1.0.0",

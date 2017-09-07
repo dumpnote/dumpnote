@@ -1,4 +1,5 @@
 const restify = require('restify');
+const sessions = require('client-sessions');
 const passport = require('passport-restify');
 const GoogleStrategy = require('passport-google-oauth20');
 const logger = require('./logger');
@@ -13,7 +14,30 @@ const app = {
 };
 
 /*
- * passport config
+ * configure server
+ */
+const server = restify.createServer({
+  name: app.name,
+  log: logger,
+});
+
+server.use(sessions({
+  cookieName: 'session',
+  secret: process.env.DN_SESS_SECRET,
+  duration: 7 * 24 * 60 * 60 * 1000,
+  activeDuration: 7 * 24 * 60 * 1000,
+}));
+server.use(passport.initialize());
+server.use(passport.session());
+server.use((req, res, next) => {
+  console.log('Req: ' + req.httpVersion + ' ' + req.method + ' ' + req.url);
+  res.setHeader('content-type', 'application/json');
+  return next();
+});
+server.use(restify.plugins.queryParser());
+
+/*
+ * configure passport
  */
 passport.use(new GoogleStrategy({
   clientID: process.env.DN_GOOG_CID,
@@ -27,22 +51,6 @@ passport.use(new GoogleStrategy({
 
 passport.serializeUser((user, done) => done(null, user.id));
 passport.deserializeUser((id, done) => User.resolve(id).then(done));
-
-/*
- * configure server
- */
-const server = restify.createServer({
-  name: app.name,
-  log: logger,
-});
-
-server.use((req, res, next) => {
-  console.log('Req: ' + req.httpVersion + ' ' + req.method + ' ' + req.url);
-  res.setHeader('content-type', 'application/json');
-  return next();
-});
-
-server.use(restify.plugins.queryParser());
 
 /*
  * util endpoints
