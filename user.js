@@ -46,10 +46,6 @@ class User {
     if (cached) {
       return cached;
     }
-    cached = resolve0(result.rows[0].id);
-    if (cached) {
-      return cached;
-    }
     const id = await User.getNextId();
     await db.tables.users.insert([id, params.name, params.email, params.gid]);
     const user = new User(id);
@@ -78,7 +74,7 @@ class User {
 
   static async resolve(id) {
     const cached = userCache.get(id);
-    return !cached ? resolve0(id) : cached;
+    return !cached ? User.resolve0(id) : cached;
   }
 }
 
