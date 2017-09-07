@@ -46,7 +46,7 @@ class User {
     if (cached) {
       return cached;
     }
-    const result = await db.tables.user.select('*')
+    const result = await db.tables.users.select('*')
       .where(new db.Predicate('gid', '=', params.gid))
       .execute();
     if (result.rowCount !== 0) {
@@ -71,7 +71,7 @@ class User {
   }
 
   static async resolve0(id) {
-    const result = await db.tables.user.select('*')
+    const result = await db.tables.users.select('*')
       .where(new db.Predicate('id', '=', id))
       .execute();
     if (result.rowCount === 0) {
