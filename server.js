@@ -3,7 +3,7 @@ const passport = require('passport-restify');
 const GoogleStrategy = require('passport-google-oauth20');
 const bunyan = require('bunyan');
 const User = require('./user');
-const initDb = require('./db').init;
+const initDb = require('./database').init;
 
 /*
  * app constants and logger
