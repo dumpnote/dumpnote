@@ -38,7 +38,7 @@ class User {
 
   static async getNextId() {
     return (await db.tables.users.select('COALESCE(MAX(id), -1)').execute())
-      .rows[0].coalesce;
+      .rows[0].coalesce + 1;
   }
 
   static async createOrGet(params) {

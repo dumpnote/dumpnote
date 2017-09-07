@@ -22,7 +22,7 @@ passport.use(new GoogleStrategy({
 }, (accessToken, refreshToken, profile, cb) => User.createOrGet({
   gid: profile.id,
   name: profile.displayName,
-  email: profile.emails[0],
+  email: profile.emails[0].value,
 }).then(cb)));
 
 passport.serializeUser((user, done) => done(null, user.id));

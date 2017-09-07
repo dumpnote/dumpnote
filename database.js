@@ -94,7 +94,7 @@ class Table {
 
   insert(values) {
     const query = `INSERT INTO ${this.name}` +
-      ` VALUES(${values.map((p, i) => `$${i}`).join(', ')})`;
+      ` VALUES (${values.map((p, i) => `$${i}`).join(', ')})`;
     logger.info(`Executing query ${query} with params ${values}`);
     return this.db.query(query, values);
   }
