@@ -3,7 +3,7 @@ const passport = require('passport-restify');
 const GoogleStrategy = require('passport-google-oauth20');
 const bunyan = require('bunyan');
 const User = require('./user');
-const initDb = require('./database').init;
+const db = require('./database').db;
 
 /*
  * app constants and logger
@@ -171,7 +171,11 @@ server.patch('/sets/:set', mwAuthed, (req, res) => {
  */
 (async () => {
   logger.info('initializing database connection.');
-  await initDb();
+  try {
+    await db.connect();
+  } catch (err) {
+    throw err;
+  }
   logger.info('starting server.');
   await server.listen(8081, () => logger.info('server started.'));
 })();

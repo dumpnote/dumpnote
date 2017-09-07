@@ -109,5 +109,5 @@ module.exports = {
   QueryBuilder: QueryBuilder,
   Predicate: Predicate,
   tables: tables,
-  init: db.connect,
+  db: db,
 };
