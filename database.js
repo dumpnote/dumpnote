@@ -68,7 +68,7 @@ class QueryBuilder {
     const params = [];
     if (this.predicate) {
       const compiled = this.predicate.compile();
-      let i = 1;
+      let i = 0;
       for (const param of compiled.params) {
         params.push(param);
       }
