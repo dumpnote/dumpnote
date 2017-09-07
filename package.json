@@ -16,6 +16,9 @@
     "pg": "^7.3.0",
     "restify": "^5.2.0"
   },
+  "engines": {
+    "node": "8.4.0"
+  },
   "scripts": {
     "start": "node server.js"
   },
