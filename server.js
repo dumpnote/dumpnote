@@ -177,5 +177,5 @@ server.patch('/sets/:set', mwAuthed, (req, res) => {
     throw err;
   }
   logger.info('starting server.');
-  await server.listen(8081, () => logger.info('server started.'));
+  await server.listen(process.env.PORT, () => logger.info('server started.'));
 })();
