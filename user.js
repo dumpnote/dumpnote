@@ -47,7 +47,7 @@ class User {
       return cached;
     }
     const result = await db.tables.users.select('*')
-      .where(new db.Predicate('gid', '=', params.gid))
+      .where(new db.Predicate('gid', '=', params.gid.toString()))
       .execute();
     if (result.rowCount !== 0) {
       const row = result.rows[0];
