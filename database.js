@@ -18,7 +18,7 @@ class Predicate {
       conj: 'AND',
       obj: other,
     });
-    return other;
+    return this;
   }
 
   or(other) {
@@ -26,14 +26,14 @@ class Predicate {
       conj: 'OR',
       obj: other,
     });
-    return other;
+    return this;
   }
 
   compile() {
-    let strVal = `&$${this.operator}$&$`;
+    let strVal = `&$${this.operator}&$`;
     const params = [this.key, this.value];
     for (const adjoined of this.adjoined) {
-      const compiled = adjoined.compile();
+      const compiled = adjoined.obj.compile();
       if (adjoined.obj.adjoined.length > 0) {
         strVal += ` ${adjoined.conj} (${compiled.strVal})`;
       } else {
@@ -64,15 +64,15 @@ class QueryBuilder {
   }
 
   execute() {
-    let query = `SELECT ${this.fields.map((f, i) => `$${i}`).join(', ')}` +
+    let query = `SELECT ${this.fields.map((f, i) => `$${i + 1}`).join(', ')}` +
         ` FROM ${this.table.name}`;
     if (this.predicate) {
       const compiled = this.predicate.compile();
-      for (const param of compiled) {
+      let i = this.fields.length + 1;
+      for (const param of compiled.params) {
         this.fields.push(param);
       }
-      let i = this.fields.length + 1;
-      compiled.strVal = compiled.strVal.replace('&$', () => i++);
+      compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
       query += ` WHERE ${compiled.strVal}`;
     }
     return this.table.db.query(query, this.fields);
