@@ -4,7 +4,8 @@ const passport = require('passport-restify');
 const GoogleStrategy = require('passport-google-oauth20');
 const logger = require('./logger');
 const User = require('./user');
-const db = require('./database').db;
+const {NoteSet, Note} = require('./note');
+const {db, Predicate} = require('./database');
 
 /*
  * app constants and logger
@@ -111,13 +112,13 @@ server.get('/notes', mwAuthed, (req, res) => {
       } else {
         operator = '=';
       }
-      predicates.push(new db.Predicate(param, operator, req.query[param]));
+      predicates.push(new Predicate(param, operator, req.query[param]));
     }
   }
   function tryAddBool(param) {
     if (req.query[param]) {
       if (req.query[param] === 'true' || req.query[param] === 'false') {
-        predicates.push(new db.Predicate(param, '=', req.query[param]));
+        predicates.push(new Predicate(param, '=', req.query[param]));
       } else {
         res.send(400, {
           error: `Expected boolean at ${param}=${req.query[param]}`,
@@ -132,7 +133,7 @@ server.get('/notes', mwAuthed, (req, res) => {
   tryAddBool('marked');
   if (req.query.search) {
     predicates.push(
-      new db.Predicate('body', ' LIKE ', `%${req.query.search}%`));
+      new Predicate('body', ' LIKE ', `%${req.query.search}%`));
   }
   req.user.getNotes(predicates)
     .then((notes) => res.send(200, notes.map((note) => note.serialize())));
