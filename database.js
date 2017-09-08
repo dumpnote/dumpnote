@@ -107,7 +107,7 @@ class Table {
     for (const field in fields) {
       if (fields.hasOwnProperty(field)) {
         params.push(fields[field]);
-        fieldStrs.push(` ${field}=&$`);
+        fieldStrs.push(`${field}=&$`);
       }
     }
     const compiled = predicate.compile();
@@ -115,8 +115,8 @@ class Table {
       params.push(param);
     }
     let i = 1;
-    const query = `UPDATE ${this.name} SET ${fieldStrs.join(', ')}` +
-      ` WHERE ${compiled.strVal}`
+    const query = (`UPDATE ${this.name} SET ${fieldStrs.join(', ')}` +
+      ` WHERE ${compiled.strVal}`)
       .replace(/&\$/g, () => `$${i++}`);
     logger.info(`Executing query ${query}` +
       ` with params ${JSON.stringify(params)}`);
