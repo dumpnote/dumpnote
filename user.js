@@ -24,7 +24,7 @@ class User {
 
   async postNote(body, set) {
     const id = await Note.getNextId();
-    const timestamp = Date.now();
+    const timestamp = new Date();
     await db.tables.notes.insert([
       id, this.id,
       !!set ? set.id : -1,
