@@ -100,15 +100,15 @@ server.get('/notes', mwAuthed, (req, res) => {
   function tryAdd(param) {
     if (req.query[param]) {
       let operator = null;
-      if (singleCharOps.some((op) => req.query[param].startsWith(op))) {
-        operator = req.query[param].substring(0, 1);
-        req.query[param] = req.query[param].substring(1);
-      } else if (twoCharOps.some((op) => req.query[param].startsWith(op))) {
+      if (twoCharOps.some((op) => req.query[param].startsWith(op))) {
         operator = req.query[param].substring(0, 2);
         if (operator === '!=') {
           operator = '<>';
         }
         req.query[param] = req.query[param].substring(2);
+      } else if (singleCharOps.some((op) => req.query[param].startsWith(op))) {
+        operator = req.query[param].substring(0, 1);
+        req.query[param] = req.query[param].substring(1);
       } else {
         operator = '=';
       }
