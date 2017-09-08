@@ -117,7 +117,7 @@ class Table {
     let i = 1;
     const query = `UPDATE ${this.name} SET${values} WHERE ${compiled.strVal}`
       .replace(/&\$/g, () => `$${i++}`);
-    return this.table.db.query(query, params);
+    return this.db.query(query, params);
   }
 
   delete(predicate) {
@@ -128,10 +128,10 @@ class Table {
     }
     let i = 1;
     compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
-    const query = `DELETE FROM ${this.table.name} WHERE ${compiled.strVal}`;
+    const query = `DELETE FROM ${this.name} WHERE ${compiled.strVal}`;
     logger.info(`Executing query ${query}` +
       ` with params ${JSON.stringify(params)}`);
-    return this.table.db.query(query, params);
+    return this.db.query(query, params);
   }
 }
 
