@@ -204,7 +204,7 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
         res.send(result.code, result.reason);
       } else {
         note = await Note.getNote(note.id);
-        res.send(200, note);
+        res.send(200, note.serialize());
       }
     });
   }
