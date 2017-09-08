@@ -43,14 +43,20 @@ passport.use(new GoogleStrategy({
   clientID: process.env.DN_GOOG_CID,
   clientSecret: process.env.DN_GOOG_SECRET,
   callbackURL: process.env.DN_GOOG_CB,
-}, (accessToken, refreshToken, profile, cb) => User.createOrGet({
-  gid: profile.id,
-  name: profile.displayName,
-  email: profile.emails[0].value,
-}).then(cb)));
+}, async (accessToken, refreshToken, profile, done) => {
+  const user = await User.createOrGet({
+    gid: profile.id,
+    name: profile.displayName,
+    email: profile.emails[0].value,
+  });
+  done(null, user);
+}));
 
 passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser((id, done) => User.resolve(id).then(done));
+passport.deserializeUser(async (id, done) => {
+  const user = await User.resolve(id);
+  done(null, user);
+});
 
 /*
  * util endpoints

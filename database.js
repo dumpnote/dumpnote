@@ -76,7 +76,8 @@ class QueryBuilder {
       compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
       query += ` WHERE ${compiled.strVal}`;
     }
-    logger.info(`Executing query ${query} with params ${JSON.stringify(params)}`);
+    logger.info(`Executing query ${query}` +
+      ` with params ${JSON.stringify(params)}`);
     return this.table.db.query(query, params);
   }
 }
@@ -95,7 +96,8 @@ class Table {
   insert(values) {
     const query = `INSERT INTO ${this.name}` +
       ` VALUES (${values.map((p, i) => `$${i + 1}`).join(', ')})`;
-    logger.info(`Executing query ${query} with params ${JSON.stringify(values)}`);
+    logger.info(`Executing query ${query}` +
+      ` with params ${JSON.stringify(values)}`);
     return this.db.query(query, values);
   }
 }
