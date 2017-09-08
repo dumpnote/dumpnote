@@ -196,9 +196,13 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
           fields[name] = body[name];
         }
       }
+      logger.info('param 0');
       tryAdd('set', 'number');
+      logger.info('param 1');
       tryAdd('body', 'string');
+      logger.info('param 2');
       tryAdd('marked', 'boolean');
+      logger.info('added params');
       const result = await note.edit(fields);
       if (result !== true) {
         res.send(result.code, result.reason);
