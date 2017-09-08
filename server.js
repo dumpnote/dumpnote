@@ -142,7 +142,13 @@ server.post('/notes', mwAuthed, (req, res) => {
   const chunks = [];
   req.on('data', (chunk) => chunks.push(chunk));
   req.on('end', async () => {
-    const body = JSON.parse(Buffer.concat(chunks).toString());
+    let body;
+    try {
+      body = JSON.parse(Buffer.concat(chunks).toString());
+    } catch (e) {
+      res.send(400, {error: e.message});
+      return;
+    }
     const note = await req.user.postNote(body.body, body.set);
     res.send(200, note);
   });
@@ -177,7 +183,13 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
     const chunks = [];
     req.on('data', (chunk) => chunks.push(chunk));
     req.on('end', async () => {
-      const body = JSON.parse(Buffer.concat(chunks).toString());
+      let body;
+      try {
+        body = JSON.parse(Buffer.concat(chunks).toString());
+      } catch (e) {
+        res.send(400, {error: e.message});
+        return;
+      }
       const fields = {};
       function tryAdd(name, type) {
         if (body.hasOwnProperty(name) && typeof(body[name]) === type) {
