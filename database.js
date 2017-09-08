@@ -31,8 +31,8 @@ class Predicate {
   }
 
   compile() {
-    let strVal = `&$${this.operator}&$`;
-    const params = [this.key, this.value];
+    let strVal = `${this.key}${this.operator}&$`;
+    const params = [this.value];
     for (const adjoined of this.adjoined) {
       const compiled = adjoined.obj.compile();
       if (adjoined.obj.adjoined.length > 0) {
