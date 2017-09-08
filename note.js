@@ -10,6 +10,14 @@ class Note {
     this.marked = params.marked;
   }
 
+  async edit(fields) {
+    return db.tables.notes.update(new db.Predicate('id', '=', this.id), fields);
+  }
+
+  async delete() {
+    return db.tables.notes.delete(new db.Predicate('id', '=', this.id));
+  }
+
   serialize() {
     return {
       id: this.id,

@@ -100,6 +100,39 @@ class Table {
       ` with params ${JSON.stringify(values)}`);
     return this.db.query(query, values);
   }
+
+  update(predicate, fields) {
+    const params = [];
+    let values = '';
+    for (const field in fields) {
+      if (fields.hasOwnProperty(field)) {
+        params.push(fields[field]);
+        values += ` ${field}=&$`;
+      }
+    }
+    const compiled = predicate.compile();
+    for (const param of compiled.params) {
+      params.push(param);
+    }
+    let i = 1;
+    const query = `UPDATE ${this.name} SET${values} WHERE ${compiled.strVal}`
+      .replace(/&\$/g, () => `$${i++}`);
+    return this.table.db.query(query, params);
+  }
+
+  delete(predicate) {
+    const params = [];
+    const compiled = predicate.compile();
+    for (const param of compiled.params) {
+      params.push(param);
+    }
+    let i = 1;
+    compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
+    const query = `DELETE FROM ${this.table.name} WHERE ${compiled.strVal}`;
+    logger.info(`Executing query ${query}` +
+      ` with params ${JSON.stringify(params)}`);
+    return this.table.db.query(query, params);
+  }
 }
 
 function getTable(name) {
