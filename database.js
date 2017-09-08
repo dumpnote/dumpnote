@@ -103,11 +103,11 @@ class Table {
 
   update(predicate, fields) {
     const params = [];
-    let values = '';
+    const fieldStrs = [];
     for (const field in fields) {
       if (fields.hasOwnProperty(field)) {
         params.push(fields[field]);
-        values += ` ${field}=&$`;
+        fieldStrs.push(` ${field}=&$`);
       }
     }
     const compiled = predicate.compile();
@@ -115,8 +115,11 @@ class Table {
       params.push(param);
     }
     let i = 1;
-    const query = `UPDATE ${this.name} SET${values} WHERE ${compiled.strVal}`
+    const query = `UPDATE ${this.name} SET ${fieldStrs.join(', ')}` +
+      ` WHERE ${compiled.strVal}`
       .replace(/&\$/g, () => `$${i++}`);
+    logger.info(`Executing query ${query}` +
+      ` with params ${JSON.stringify(params)}`);
     return this.db.query(query, params);
   }
 
