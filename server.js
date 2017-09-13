@@ -201,13 +201,9 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
       tryAdd('set', 'number');
       tryAdd('body', 'string');
       tryAdd('marked', 'boolean');
-      const result = await note.edit(fields);
-      if (result !== true) {
-        res.send(result.code, result.reason);
-      } else {
-        note = await Note.getNote(note.id);
-        res.send(200, note.serialize());
-      }
+      await note.edit(fields);
+      note = await Note.getNote(note.id);
+      res.send(200, note.serialize());
     });
   }
 });
@@ -285,13 +281,9 @@ server.patch('/sets/:set', mwAuthed, async (req, res) => {
       if (!!fields.type && !noteSetTypes.includes(fields.type)) {
         res.send(400, {error: 'Bad set type!'});
       } else {
-        const result = await set.edit(fields);
-        if (result !== true) {
-          res.send(result.code, result.reason);
-        } else {
-          set = await NoteSet.getSet(set.id);
-          res.send(200, set.serialize());
-        }
+        await set.edit(fields);
+        set = await NoteSet.getSet(set.id);
+        res.send(200, set.serialize());
       }
     });
   }
