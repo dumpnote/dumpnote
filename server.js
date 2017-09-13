@@ -215,6 +215,7 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
 /*
  * set endpoints
  */
+const noteSetTypes = ['daily', 'monthly', 'untimed'];
 server.get('/sets', mwAuthed, (req, res) => {
   req.user.getNoteSets()
     .then((sets) => res.send(200, sets.map((s) => s.serialize())));
@@ -281,12 +282,16 @@ server.patch('/sets/:set', mwAuthed, async (req, res) => {
       }
       tryAdd('name', 'string');
       tryAdd('type', 'string');
-      const result = await set.edit(fields);
-      if (result !== true) {
-        res.send(result.code, result.reason);
+      if (!!fields.type && !noteSetTypes.includes(fields.type)) {
+        res.send(400, {error: 'Bad set type!'});
       } else {
-        set = await NoteSet.getSet(set.id);
-        res.send(200, set.serialize());
+        const result = await set.edit(fields);
+        if (result !== true) {
+          res.send(result.code, result.reason);
+        } else {
+          set = await NoteSet.getSet(set.id);
+          res.send(200, set.serialize());
+        }
       }
     });
   }
