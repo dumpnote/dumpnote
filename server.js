@@ -150,7 +150,7 @@ server.post('/notes', mwAuthed, (req, res) => {
       return;
     }
     const note = await req.user.postNote(body.body, body.set);
-    res.send(200, note);
+    res.send(200, note.serialize());
   });
 });
 
@@ -158,6 +158,8 @@ server.get('/notes/:note', mwAuthed, async (req, res) => {
   const note = await Note.getNote(req.params.note);
   if (!note) {
     res.send(404, {error: 'Note not found!'});
+  } else if (note.owner !== req.user.id) {
+    res.send(403, {error: 'No permission!'});
   } else {
     res.send(200, note.serialize());
   }
@@ -176,7 +178,7 @@ server.del('/notes/:note', mwAuthed, async (req, res) => {
 server.patch('/notes/:note', mwAuthed, async (req, res) => {
   let note = await Note.getNote(req.params.note);
   if (!note) {
-    res.send(404, {error: 'Note not found1'});
+    res.send(404, {error: 'Note not found!'});
   } else if (note.owner !== req.user.id) {
     res.send(403, {error: 'No permission!'});
   } else {
@@ -214,20 +216,80 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
  * set endpoints
  */
 server.get('/sets', mwAuthed, (req, res) => {
-  res.send(501, {error: 'Not implemented!'});
+  req.user.getNoteSets()
+    .then((sets) => res.send(200, sets.map((s) => s.serialize())));
 });
 server.post('/sets', mwAuthed, (req, res) => {
-  res.send(501, {error: 'Not implemented!'});
+  const chunks = [];
+  req.on('data', (chunk) => chunks.push(chunk));
+  req.on('end', async () => {
+    let body;
+    try {
+      body = JSON.parse(Buffer.concat(chunks).toString());
+    } catch (e) {
+      res.send(400, {error: e.message});
+      return;
+    }
+    const set = await req.user.createSet(body.name, body.type);
+    res.send(200, set.serialize());
+  });
 });
 
-server.get('/sets/:set', mwAuthed, (req, res) => {
-  res.send(501, {error: 'Not implemented!'});
+server.get('/sets/:set', mwAuthed, async (req, res) => {
+  const set = await NoteSet.getSet(req.params.set);
+  if (!set) {
+    res.send(404, {error: 'Set not found!'});
+  } else if (set.owner !== req.user.id) {
+    res.send(403, {error: 'No permission!'});
+  } else {
+    res.send(200, set.serialize());
+  }
 });
-server.del('/sets/:set', mwAuthed, (req, res) => {
-  res.send(501, {error: 'Not implemented!'});
+server.del('/sets/:set', mwAuthed, async (req, res) => {
+  const set = await NoteSet.getSet(req.params.set);
+  if (!set) {
+    res.send(404, {error: 'Set not found!'});
+  } else if (set.owner !== req.user.id) {
+    res.send(403, {error: 'No permission!'});
+  } else {
+    await set.delete();
+    res.send(200, set.serialize());
+  }
 });
-server.patch('/sets/:set', mwAuthed, (req, res) => {
-  res.send(501, {error: 'Not implemented!'});
+server.patch('/sets/:set', mwAuthed, async (req, res) => {
+  let set = await NoteSet.getSet(req.params.set);
+  if (!set) {
+    res.send(404, {error: 'Set not found!'});
+  } else if (set.owner !== req.user.id) {
+    res.send(403, {error: 'No permission!'});
+  } else {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', async () => {
+      let body;
+      try {
+        body = JSON.parse(Buffer.concat(chunks).toString());
+      } catch (e) {
+        res.send(400, {error: e.message});
+        return;
+      }
+      const fields = {};
+      function tryAdd(name, type) {
+        if (body.hasOwnProperty(name) && typeof(body[name]) === type) {
+          fields[name] = body[name];
+        }
+      }
+      tryAdd('name', 'string');
+      tryAdd('type', 'string');
+      const result = await set.edit(fields);
+      if (result !== true) {
+        res.send(result.code, result.reason);
+      } else {
+        set = await NoteSet.getSet(set.id);
+        res.send(200, set.serialize());
+      }
+    });
+  }
 });
 
 /*

@@ -36,6 +36,16 @@ class User {
     });
   }
 
+  async createSet(name, type) {
+    const id = await NoteSet.getNextId();
+    await db.tables.sets.insert([
+      id, this.id, name, type,
+    ]);
+    return new NoteSet({
+      id: id, owner: this.id, name: name, type: type,
+    });
+  }
+
   static async getNextId() {
     return (await db.tables.users.select('COALESCE(MAX(id), -1)').execute())
       .rows[0].coalesce + 1;
