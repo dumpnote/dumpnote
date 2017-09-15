@@ -55,7 +55,10 @@ class NoteSet {
   }
 
   async delete() {
-    return db.tables.sets.delete(new db.Predicate('id', '=', this.id));
+    return (async () => {
+      await db.tables.notes.delete(new db.Predicate('set', '=', this.id));
+      await db.tables.sets.delete(new db.Predicate('id', '=', this.id));
+    })();
   }
 
   async getNotes() {
