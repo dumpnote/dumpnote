@@ -1,5 +1,5 @@
 const db = require('./database');
-const Note = require('./note').Note;
+const {Note, NoteSet} = require('./note');
 
 const userCache = new Map();
 const userCacheByGid = new Map();
@@ -12,11 +12,14 @@ class User {
     this.gid = null;
   }
 
-  async getNotes(predicates) {
-    const query = db.tables.notes.select('*');
+  async getNotes(predicates, offset) {
+    const query = db.tables.notes.select('*').limit(16);
     const predicate = new db.Predicate('owner', '=', this.id);
     for (const paramPred of predicates) {
       predicate.and(paramPred);
+    }
+    if (offset) {
+      query.offset(offset);
     }
     const result = await query.where(predicate).execute();
     return result.rows.map((row) => new Note(row));
@@ -34,6 +37,15 @@ class User {
       id: id, owner: this.id, set: !!set ? set.id : null,
       timestamp: timestamp, body: body, marked: false,
     });
+  }
+
+  async getNoteSets(offset) {
+    const query = db.tables.sets.select('*').limit(16);
+    if (offset) {
+      query.offset(offset);
+    }
+    const result = await query.execute();
+    return result.rows.map((row) => new NoteSet(row));
   }
 
   async createSet(name, type) {

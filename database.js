@@ -57,10 +57,22 @@ class QueryBuilder {
     this.table = table;
     this.fields = fields;
     this.predicate = null;
+    this.limit = -1;
+    this.offset = -1;
   }
 
   where(predicate) {
     this.predicate = predicate;
+    return this;
+  }
+
+  limit(limit) {
+    this.limit = limit;
+    return this;
+  }
+
+  offset(offset) {
+    this.offset = offset;
     return this;
   }
 
@@ -75,6 +87,12 @@ class QueryBuilder {
       }
       compiled.strVal = compiled.strVal.replace(/&\$/g, () => `$${i++}`);
       query += ` WHERE ${compiled.strVal}`;
+    }
+    if (this.limit > 0) {
+      query += ` LIMIT ${this.limit}`;
+      if (this.offset > 0) {
+        query += ` OFFSET ${this.offset}`;
+      }
     }
     logger.info(`Executing query ${query}` +
       ` with params ${JSON.stringify(params)}`);

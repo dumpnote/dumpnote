@@ -135,7 +135,7 @@ server.get('/notes', mwAuthed, (req, res) => {
     predicates.push(
       new Predicate('body', ' LIKE ', `%${req.query.search}%`));
   }
-  req.user.getNotes(predicates)
+  req.user.getNotes(predicates, req.query.offset)
     .then((notes) => res.send(200, notes.map((note) => note.serialize())));
 });
 server.post('/notes', mwAuthed, (req, res) => {
@@ -213,7 +213,7 @@ server.patch('/notes/:note', mwAuthed, async (req, res) => {
  */
 const noteSetTypes = ['daily', 'monthly', 'untimed'];
 server.get('/sets', mwAuthed, (req, res) => {
-  req.user.getNoteSets()
+  req.user.getNoteSets(req.query.offset)
     .then((sets) => res.send(200, sets.map((s) => s.serialize())));
 });
 server.post('/sets', mwAuthed, (req, res) => {
